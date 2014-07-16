@@ -5,12 +5,7 @@ html {
   padding-left: 20px;
   padding-right: 20px;
 }
-body {
-  width: 3000px;
-  padding-left: 10px;
-	padding-right: 20px;
-	background-color: transparent;
-}
+
 
 /* ===============================
  *  Copy
@@ -73,7 +68,7 @@ body {
   .rounded-corners;
   background-color: white;
   padding: 10px;
-  border: 1px solid #e1e1e8;
+  border: 1px solid @backgroundGrey;
   float: left;
 }
 .wrap {
@@ -83,12 +78,10 @@ body {
 }
 .left-column {
 	.column;
-  width: 400px;
-  margin-right: 10px;
-
 }
-.right-column {
+.diagram-column {
   .column;
+  background-color: @backgroundGrey;
 }
 
 /* ===============================
