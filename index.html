@@ -15,7 +15,6 @@
 	<script src="lib/raphael-min.js" type="text/javascript"></script>
 	<script src="lib/coffee-script.js" type="text/javascript"></script>
 
-
 	<!-- my stuff -->
 	<script src="dramagrama.coffee" type="text/coffeescript"></script>
 	<script src="drawer.coffee" type="text/coffeescript"></script>
@@ -26,8 +25,8 @@
 	<link href='http://fonts.googleapis.com/css?family=Shadows+Into+Light+Two' rel='stylesheet' type='text/css'>
 
 	<!-- svg to canvas (so then i can image it) -->
-	<script type="text/javascript" src="lib/rgbcolor.js"></script> 
-	<script type="text/javascript" src="lib/canvg.js"></script> 
+	<script type="text/javascript" src="lib/rgbcolor.js"></script>
+	<script type="text/javascript" src="lib/canvg.js"></script>
 
 </head>
 
@@ -41,46 +40,49 @@
 		
 	</div>
 
-	<div class="wrap">
-	<div class="left-column">
-		<div class="title" style="overflow:hidden">Code your diagram here 
-			<button class="btn btn-primary btn-mini" id="diagramophone" style="float: right">GO</button>
-		</div>	
-		<textarea style="width:390px" id="textarea" rows="17"></textarea>
+	<div class="row">
+        <div class="left-column col-md-4">
+            <div class="title" style="overflow:hidden">Code your diagram here
+                <button class="btn btn-primary btn-mini" id="diagramophone" style="float: right">GO</button>
+            </div>
+            <textarea style="width:390px" id="textarea" rows="17"></textarea>
 
-		<br/>
-		<div class="title">Settings</div>
-		<label class="checkbox">
-          		<input type="checkbox" id="fontBtn" checked="true">use silly handwritten font
-        </label>
-        <label class="checkbox">
-      		<input type="checkbox" id="replBtn" checked="false">live updates -- this will make things slower
-    	</label>
-    	<br/>
-    	<div class="title">Remind me about my options?</div>
-    	<div class="well">
-    		<p class="code comment">// no arrow</p>
-    		<p class="code">a -- b</p>
-    		<p class="code">a .. b</p>
-    		<p class="code comment">// arrows (and in the other direction)</p>
-    		<p class="code">a -&gt; b</p>
-    		<p class="code">a ..&gt; b</p>
-    		<p class="code comment">// diamonds (or in both directions)</p>
-    		<p class="code">a -&lt;&gt; b</p>
-    		<p class="code">a ..&lt;&gt; b</p>
-    		<p class="code comment">// colours and messages</p>
-    		<p class="code">a {red} .. b {#ffb700} : o hai arrow!</p>
-    	</div>
-	</div>
+            <br/>
+            <div class="title">Settings</div>
+            <label class="checkbox">
+                    <input type="checkbox" id="fontBtn" checked="true">use silly handwritten font
+            </label>
+            <label class="checkbox">
+                <input type="checkbox" id="replBtn" checked="false">live updates -- this will make things slower
+            </label>
+            <br/>
+            <div class="title">Remind me about my options?</div>
+            <div class="well">
+                <p class="code comment">// no arrow</p>
+                <p class="code">a -- b</p>
+                <p class="code">a .. b</p>
+                <p class="code comment">// arrows (and in the other direction)</p>
+                <p class="code">a -&gt; b</p>
+                <p class="code">a ..&gt; b</p>
+                <p class="code comment">// diamonds (or in both directions)</p>
+                <p class="code">a -&lt;&gt; b</p>
+                <p class="code">a ..&lt;&gt; b</p>
+                <p class="code comment">// colours and messages</p>
+                <p class="code">a {red} .. b {#ffb700} : o hai arrow!</p>
+            </div>
+        </div>
 
-	<div class="right-column">
-		<div class="title" style="overflow:hidden">Image comes out here &nbsp;&nbsp;&nbsp;&nbsp;
-			<button class="btn btn-primary btn-mini" id="saveIt">SAVE IT</button>
-		</div>	
-		<div id="canvas"> </div>
-	</div>	
+        <div class="diagram-column col-md-8">
+            <div class="title" style="overflow:hidden">Image comes out here &nbsp;&nbsp;&nbsp;&nbsp;
+                <button class="btn btn-primary btn-mini" id="saveIt">SAVE IT</button>
+            </div>
+            <div id="canvas"> </div>
+        </div>
 	</div>
 </body>
+
+
+
 <script type="text/coffeescript">
 @controller = new Controller
 
