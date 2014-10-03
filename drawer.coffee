@@ -7,6 +7,10 @@ class window.Drawer
 	constructor: (@paper) ->
 		@paper.clear()
 
+        # this is pretty awkward, but let's put the onclick for nodes here
+		Drawer.click_node = (node_id) ->
+			console.log(node_id + ' clicked. Overload window.Drawer.click_node to use.')
+
 		# where to start drawing
 		@startPoint = new Point 10, 10
 		
@@ -95,6 +99,8 @@ class window.Drawer
 			"text-anchor": "middle"
 			})
 		t.attr("text", content)
+		t[0].setAttribute("class", 'diagramophone-node-text')
+		t[0].setAttribute("onclick", "Drawer.click_node('" + content + "')")
 
 		textWidth = Math.max(t.getBBox().width, @rectangleWidth)
 		textHeight = Math.max(t.getBBox().height, @rectangleHeight)
