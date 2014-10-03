@@ -7,10 +7,6 @@ class window.Drawer
 	constructor: (@paper) ->
 		@paper.clear()
 
-        # this is pretty awkward, but let's put the onclick for nodes here
-		Drawer.click_node = (node_id) ->
-			console.log(node_id + ' clicked. Overload window.Drawer.click_node to use.')
-
 		# where to start drawing
 		@startPoint = new Point 10, 10
 		
@@ -164,6 +160,12 @@ class window.Drawer
 	drawPath: (point1, point2, head, dash) ->
 		@paper.path("M{0},{1}L{2},{3}", point1.x, point1.y, point2.x, point2.y)
 		.attr({"stroke-dasharray": dash, "stroke-width": 2, "arrow-end":head + "-wide-long"})
+
+
+	click_node: (node_id) ->
+		# this is pretty awkward, but let's put the onclick for nodes here
+		console.log(node_id + ' clicked. Overload window.Drawer.click_node to use.')
+
 
 ##############################
 #	Classes that want to help
