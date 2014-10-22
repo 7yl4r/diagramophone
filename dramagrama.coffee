@@ -48,8 +48,8 @@ class window.Controller
 			
 
 	repositionBlock: (block, point, graph) ->
-		console.log('r_block:', block)
 		return 0 unless block
+		console.log('r_block:', block)
 
 		childY = point.y
 		childX = point.x

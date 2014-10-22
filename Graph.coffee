@@ -30,21 +30,23 @@ class Graph
 
     add_node: (name, parents=[], children=[], others={}) ->
         ###
-        adds a node to the model. returns node if added, undefined if node already exists.
+        adds a node to the model. returns node if added or existing node if already exists.
         :param others: an object with additional key-value pairs to be added to the node
         ###
-        if @get_node(name) == undefined
-            new_node = {
-                "name":name,
-                "parents": parents,
-                "children": children}
-            for attribute of others
-                new_node.attribute = others.attribute
-            @nodes.push(new_node)
-            @node_count += 1
-            return new_node
-        else
-            return undefined
+        try
+            existing_node = @get_node(name)
+            return existing_node
+        catch err
+            if err.message == 'node not found:"+name
+                new_node = {
+                    "name":name,
+                    "parents": parents,
+                    "children": children}
+                for attribute of others
+                    new_node.attribute = others.attribute
+                @nodes.push(new_node)
+                @node_count += 1
+                return new_node
 
     update_node: (name, parents, children) ->
         ###
@@ -65,12 +67,25 @@ class Graph
         return @get_node(old_name).name = new_name
 
     add_edge: (from_node, to_node) ->
-        fn = @get_node(from_node)
-        tn = @get_node(to_node)
-        if to_node not in fn.children
-            fn.children.push(to_node)
-        if from_node not in tn.parents
-            tn.parents.push(from_node)
+        # get node objects if name strings are given
+        if from_node.name  # if node object given, use it
+            fn = from_node
+        else  # must be node name
+            fn = @get_node(from_node)
+
+        if to_node.name
+            tn = to_node
+        else
+            tn = @get_node(to_node)
+
+        if fn and tn
+            # connect if not already connected
+            if to_node not in fn.children
+                fn.children.push(to_node)
+            if from_node not in tn.parents
+                tn.parents.push(from_node)
+        else
+            throw Error("cannot add edge, invalid nodes:" + from_node + '=' + fn + ', ' + to_node + '=' + tn)
 
     get_parents_of: (node_id) ->
         ###
@@ -85,7 +100,8 @@ class Graph
         for node in @nodes
             if node.name == id
                 return node
-        return undefined
+
+        throw Error("node not found:" + id)
 
 try  # use as global class if client
     window.Graph = Graph

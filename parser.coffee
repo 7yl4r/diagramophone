@@ -19,14 +19,27 @@ class window.Parser
 			aname = bit.first.name
 			bname = bit.second.name
 
-			a = graph.get_node(aname)
-			b = graph.get_node(bname)
-			
-			graph.add_node(aname, [], [bname], {colour: ""}) if !a 
-			graph.add_node(bname, [aname], [], {colour: ""}) if !b
+			a = graph.add_node(aname, [], [], {colour: ""}) if aname != ''
+			b = graph.add_node(bname, [], [], {colour: ""}) if bname != ''
 
 			# don't panic about self loops
 			continue if aname == bname
+
+			if a and b
+				if b.arrow
+					if b.arrow.direction == "left" or b.arrow.direct == undefined
+						graph.add_edge(b, a)
+					else if b.arrow.direction == "right"
+						graph.add_edge(a, b)
+					else if b.arrow.direction == "both"
+						graph.add_edge(a, b)
+						graph.add_edge(b, a)
+					else
+						throw Error("unknown edge type:"+b.arrow.direction)
+				else
+						graph.add_edge(a, b)
+
+
 
 			# if the colours or arrow have updated, save them
 			a.colour = bit.first.colour if a && bit.first.colour
@@ -160,7 +173,7 @@ class window.Parser
 			type = ""
 		
 		# direction: left, right, both
-		# here we're assuming that botht he diamond and the arrow end in a >
+		# here we're assuming that both the diamond and the arrow end in a >
 		if text[0] == "<" and text[text.length-1] == ">"
 			direction = "both"
 		else if text[0] == "<"
