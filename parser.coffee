@@ -1,6 +1,7 @@
 class window.Parser
 	constructor: ->
-
+		@topLevelNode = ''
+		
 	parse: (text) ->
 		allTheLines = text.split("\n")
 		parsedBits = []
@@ -10,32 +11,22 @@ class window.Parser
 		return @parseTree parsedBits
 
 	parseTree: (parsedBits) ->
-		tree = {children: []}
+		### converts parsed bits into a Graph object ###
+		graph = new Graph
 		
 		for bit in parsedBits
 			continue unless bit
 			aname = bit.first.name
 			bname = bit.second.name
 
-			a = @findNodeInTree aname, tree
-			b = @findNodeInTree bname, tree
-
-			# do we need to add the parent block to the tree?
-			tree.children.push a = {name: aname, colour: "", children:[]} if !a
+			a = graph.get_node(aname)
+			b = graph.get_node(bname)
+			
+			graph.add_node(aname, [], [bname], {colour: ""}) if !a 
+			graph.add_node(bname, [aname], [], {colour: ""}) if !b
 
 			# don't panic about self loops
 			continue if aname == bname
-
-			# if b doesn't exist, it's easy. just add it and be done
-			if !b and bname != ""
-				b = {name: bname, colour: "", children:[]}
-				a.children.push b
-			else if b
-				a.children.push b
-				# dislodge the first level node if needed
-				if @isFirstLevelNode b, tree
-					# TODO: this is pretty crappy
-					tree.children[tree.children.indexOf(b)] = null
 
 			# if the colours or arrow have updated, save them
 			a.colour = bit.first.colour if a && bit.first.colour
@@ -44,25 +35,15 @@ class window.Parser
 				b.colour = bit.second.colour if bit.second.colour
 				b.arrow = bit.arrow if bit.arrow
 
-		return tree
-
-	findNodeInTree: (findMe, tree) ->
-		return tree if tree.name is findMe
-		
-		# maybe it's one of the children?
-		for child in tree.children
-			continue if !child
-			return child if child.name is findMe
-
-			# maybe it's a grand child?
-			maybeInChild = @findNodeInTree findMe, child
-			return maybeInChild if maybeInChild
-
-		return null
+		return graph
 			
-	isFirstLevelNode: (node, tree) ->
-		for child in tree.children
-			return true if child and child.name == node.name
+	isFirstLevelNode: (node, graph) ->
+		### returns true if given node has no parents in given graph ###
+		if @topLevelNode != ''
+			for node in graph.nodes
+				if node and node.parents.length == 0
+					@topLevelNode = node.name
+					return true 
 		
 		return false
 

@@ -4,32 +4,33 @@ class window.Controller
 		@drawer = new Drawer(paper)
 		return unless inputText
 		
-		blockTree = @parser.parse inputText
-		return unless blockTree
+		blockGraph = @parser.parse inputText
+		return unless blockGraph
 
 		@applySomePropertiesOfSorts(hasSillyFont)
 		
 		###
 		Hey! This might look insane, but isn't. here is why:
 		1. draw all the blocks on the canvas, without positioning them
-		    - unless you do this, you can't tell exactly what the height of each block is
-		    (because the text inside it can be arbitrarily long)
+			- unless you do this, you can't tell exactly what the height of each block is
+			(because the text inside it can be arbitrarily long)
 		2. now that you have the heights of all the of the blocks, you can position them around
 		3. now that you've positioned them around, you can draw the arrows that connect them
 		###
-
+		console.log('graph', blockGraph)
+		
 		@blocksThatIHaveDrawn = {}	# don't want to double draw blocks
-		blockTree = @drawUnpositionedBlock(blockTree)
+		@drawUnpositionedBlock(node, blockGraph) for node in blockGraph.nodes
 
 		@blocksThatIHaveDrawn = {}	# don't want to move around already drawn children shared by parents
-		@repositionBlock(blockTree, @drawer.startPoint)
+		@repositionBlock(node, @drawer.startPoint, blockGraph) for node in blockGraph.nodes
 
-		@drawConnectors(blockTree)
+		@drawConnectors(node, blockGraph) for node in blockGraph.nodes
 	
 	##############################
 	#	Things about drawing
 	##############################
-	drawUnpositionedBlock: (block) ->
+	drawUnpositionedBlock: (block, graph) ->
 		return unless block
 
 		# don't double draw
@@ -37,15 +38,17 @@ class window.Controller
 			return
 
 		#first, if you're a node, draw yourself
-		drawnBlock = @drawer.drawUnpositionedBlock block if block.name
+		drawnBlock = @drawer.drawUnpositionedBlock(block, graph) if block.name
 		@blocksThatIHaveDrawn[block.name] = drawnBlock
 
 		# recursively draw all your children
-		@drawUnpositionedBlock(child) for child in block.children
+		@drawUnpositionedBlock(graph.get_node(childId), graph) for childId in block.children
 		
 		return block
+			
 
-	repositionBlock: (block, point) ->
+	repositionBlock: (block, point, graph) ->
+		console.log('r_block:', block)
 		return 0 unless block
 
 		childY = point.y
@@ -53,12 +56,12 @@ class window.Controller
 		childY += block.height + @drawer.childrenVerticalPadding if block.height
 
 		totalChildLength = 0
-
 		# first draw all the children
-		for child in block.children
+		for childId in block.children
+			child = graph.get_node(childId)
 			nextChildStart = new Point childX, childY
 
-			childWidth = @repositionBlock(child, nextChildStart)
+			childWidth = @repositionBlock(child, nextChildStart, graph)
 			totalChildLength += childWidth + @drawer.childrenHorizontalPadding
 			childX = childX + childWidth + @drawer.childrenHorizontalPadding
 
@@ -78,15 +81,16 @@ class window.Controller
 			return block.width  
 		else return Math.max(block.width, totalChildLength)
 			
-	drawConnectors: (block) ->
+	drawConnectors: (block, graph) ->
 		return unless block
 
 		parentBlock = @blocksThatIHaveDrawn[block.name]
-		for child in block.children
+		for childId in block.children
+			child = graph.get_node(childId)
 			if block.name
 				childBlock = @blocksThatIHaveDrawn[child.name]
 				@drawer.connectExistingBlocks(parentBlock, childBlock, "down", child.arrow )
-			@drawConnectors(child)
+			@drawConnectors(child, graph)
 
 	##############################
 	#	Things not about drawing
