@@ -26,7 +26,6 @@ class Parser
 			a = graph.add_node(aname, [], [], {colour: ""}) if !a and aname
 			b = graph.add_node(bname, [], [], {colour: ""}) if !b and bname
 
-
 			# don't panic about self loops
 			continue if aname == bname
 

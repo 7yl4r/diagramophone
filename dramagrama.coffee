@@ -33,7 +33,7 @@ class Controller
 	##############################
 	drawUnpositionedBlock: (block, graph) ->
 		return unless block
-		console.log('b:',block)
+		return if block.name in @blocksThatIHaveDrawn
 
 		# don't double draw
 		if block.name and @blocksThatIHaveDrawn[block.name]
@@ -50,6 +50,10 @@ class Controller
 			
 
 	repositionBlock: (block, point, graph) ->
+		###
+		moves the given block in the given graph to the given point
+		:returns: the width of the block's parent chain so far (for positioning)
+		###
 		return 0 unless block
 		console.log('r_block:', block)
 
@@ -60,6 +64,8 @@ class Controller
 		totalChildLength = 0
 		# first draw all the children
 		for childId in block.children
+			continue if childId in @blocksThatIHaveDrawn  # stops inf loop for cycles
+			console.log('repos', childId, 'bc not in', @blocksThatIHaveDrawn)
 			child = graph.get_node(childId)
 			nextChildStart = new Point childX, childY
 

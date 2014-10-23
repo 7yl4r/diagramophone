@@ -83,7 +83,7 @@ class Graph
             if from_node not in tn.parents
                 tn.parents.push(from_node)
 
-            if to_node in @root_node  # if orphan is gaining a parent
+            if to_node in @root_node.children  # if orphan is gaining a parent
                 # unroot it
                 @root_node.children.splice(@root_node.children.indexOf(to_node), 1)
 
