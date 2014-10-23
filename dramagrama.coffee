@@ -1,4 +1,4 @@
-class window.Controller
+class Controller
 	makeItGo: (inputText, paper, hasSillyFont)->
 		@parser = new Parser
 		@drawer = new Drawer(paper)
@@ -18,27 +18,29 @@ class window.Controller
 		3. now that you've positioned them around, you can draw the arrows that connect them
 		###
 		console.log('graph', blockGraph)
-		
+		window.graph = blockGraph
+
 		@blocksThatIHaveDrawn = {}	# don't want to double draw blocks
-		@drawUnpositionedBlock(node, blockGraph) for node in blockGraph.nodes
+		@drawUnpositionedBlock(blockGraph.nodes[nodeId], blockGraph) for nodeId of blockGraph.nodes
 
 		@blocksThatIHaveDrawn = {}	# don't want to move around already drawn children shared by parents
-		@repositionBlock(node, @drawer.startPoint, blockGraph) for node in blockGraph.nodes
+		@repositionBlock(blockGraph.nodes[nodeId], @drawer.startPoint, blockGraph) for nodeId of blockGraph.nodes
 
-		@drawConnectors(node, blockGraph) for node in blockGraph.nodes
+		@drawConnectors(blockGraph.nodes[nodeId], blockGraph) for nodeId of blockGraph.nodes
 	
 	##############################
 	#	Things about drawing
 	##############################
 	drawUnpositionedBlock: (block, graph) ->
 		return unless block
+		console.log('b:',block)
 
 		# don't double draw
 		if block.name and @blocksThatIHaveDrawn[block.name]
 			return
 
-		#first, if you're a node, draw yourself
-		drawnBlock = @drawer.drawUnpositionedBlock(block, graph) if block.name
+		#first draw yourself
+		drawnBlock = @drawer.drawUnpositionedBlock(block, graph) if block.parents
 		@blocksThatIHaveDrawn[block.name] = drawnBlock
 
 		# recursively draw all your children
@@ -111,4 +113,8 @@ class window.Controller
 		img = canvas.toDataURL("image/png")
 		window.open(img, "_blank")
 
+try  # use as global class if client
+	window.Controller = Controller
+catch error  # export if node.js
+	module.exports = Controller
 

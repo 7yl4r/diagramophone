@@ -5,7 +5,7 @@ class Graph
     ```js
     {
         "node_count": 2,
-        "nodes":[
+        "nodes":{
             {
                 "name":"node1",
                 "parents": [],
@@ -19,14 +19,14 @@ class Graph
                 ],
                 "children": []
             }
-        ]
+        }
     }
     ```
     ###
     
     constructor: ->
         @node_count = 0
-        @nodes = []
+        @nodes = {}
 
     add_node: (name, parents=[], children=[], others={}) ->
         ###
@@ -37,16 +37,16 @@ class Graph
             existing_node = @get_node(name)
             return existing_node
         catch err
-            if err.message == 'node not found:"+name
+            if err.message.split(':')[0] == "node not found"
+                console.log('adding new node')
                 new_node = {
-                    "name":name,
                     "parents": parents,
                     "children": children}
                 for attribute of others
                     new_node.attribute = others.attribute
-                @nodes.push(new_node)
+                @nodes[name] = new_node
                 @node_count += 1
-                return new_node
+                return @nodes[name]
 
     update_node: (name, parents, children) ->
         ###
@@ -64,19 +64,13 @@ class Graph
             @add_node(name, parents ? [], children ? [])
 
     rename_node: (old_name, new_name) ->
-        return @get_node(old_name).name = new_name
+        @nodes[new_name] = @get_node(old_name)
+        delete @nodes[old_name]
 
     add_edge: (from_node, to_node) ->
-        # get node objects if name strings are given
-        if from_node.name  # if node object given, use it
-            fn = from_node
-        else  # must be node name
-            fn = @get_node(from_node)
-
-        if to_node.name
-            tn = to_node
-        else
-            tn = @get_node(to_node)
+        ### adds a connection between two nodes given by id strings. returns true if success ###
+        fn = @get_node(from_node)
+        tn = @get_node(to_node)
 
         if fn and tn
             # connect if not already connected
@@ -84,8 +78,9 @@ class Graph
                 fn.children.push(to_node)
             if from_node not in tn.parents
                 tn.parents.push(from_node)
+            return true
         else
-            throw Error("cannot add edge, invalid nodes:" + from_node + '=' + fn + ', ' + to_node + '=' + tn)
+            throw Error("cannot add edge, invalid nodes:" + from_node + "=" + fn + ", " + to_node + "=" + tn)
 
     get_parents_of: (node_id) ->
         ###
@@ -97,11 +92,12 @@ class Graph
         ###
         _Returns:_ the node object.
         ###
-        for node in @nodes
-            if node.name == id
-                return node
-
-        throw Error("node not found:" + id)
+        node = @nodes[id]
+        if node
+            return node
+        else
+            console.log('cannot find node:', id)
+            throw Error("node not found")
 
 try  # use as global class if client
     window.Graph = Graph

@@ -1,4 +1,4 @@
-class window.Drawer
+class Drawer
 
 	##############################
 	#	Initialize ALL the things
@@ -166,12 +166,16 @@ class window.Drawer
 		# this is pretty awkward, but let's put the onclick for nodes here
 		console.log(node_id + ' clicked. Overload window.Drawer.click_node to use.')
 
+try  # use as global class if client
+	window.Drawer = Drawer
+catch error  # export if node.js
+	module.exports = Drawer
 
 ##############################
 #	Classes that want to help
 ##############################
 
-class window.Rectangle
+class Rectangle
 	constructor: (@top, @width, @height) ->
 
 	getConnectorForDirection: (direction) ->
@@ -181,9 +185,18 @@ class window.Rectangle
 			when "left" 	then return new Point @top.x, 			@top.y+(@height/2)
 			when "right" 	then return new Point @top.x+@width, 	@top.y+(@height/2)
 
-class window.Point
+try  # use as global class if client
+	window.Rectangle = Rectangle
+catch error  # export if node.js
+	module.exports = Rectangle
+
+class Point
 	constructor: (@x, @y) ->
 
 	clone: (otherPoint) ->
 		newPoint = new Point(otherPoint.x, otherPoint.y)
 
+try  # use as global class if client
+	window.Point = Point
+catch error  # export if node.js
+	module.exports = Point

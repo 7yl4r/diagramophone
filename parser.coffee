@@ -1,4 +1,4 @@
-class window.Parser
+class Parser
 	constructor: ->
 		@topLevelNode = ''
 		
@@ -19,8 +19,13 @@ class window.Parser
 			aname = bit.first.name
 			bname = bit.second.name
 
-			a = graph.add_node(aname, [], [], {colour: ""}) if aname != ''
-			b = graph.add_node(bname, [], [], {colour: ""}) if bname != ''
+			console.log('a:',aname,'.','b:',bname,'.')
+			try
+				a = graph.add_node(aname, [], [], {colour: ""})
+				b = graph.add_node(bname, [], [], {colour: ""})
+			catch err
+				if err.message != 'node not found'
+					throw err
 
 			# don't panic about self loops
 			continue if aname == bname
@@ -28,16 +33,16 @@ class window.Parser
 			if a and b
 				if b.arrow
 					if b.arrow.direction == "left" or b.arrow.direct == undefined
-						graph.add_edge(b, a)
+						graph.add_edge(bname, aname)
 					else if b.arrow.direction == "right"
-						graph.add_edge(a, b)
+						graph.add_edge(aname, bname)
 					else if b.arrow.direction == "both"
-						graph.add_edge(a, b)
-						graph.add_edge(b, a)
+						graph.add_edge(aname, bname)
+						graph.add_edge(bname, aname)
 					else
 						throw Error("unknown edge type:"+b.arrow.direction)
 				else
-						graph.add_edge(a, b)
+						graph.add_edge(aname, bname)
 
 
 
@@ -52,11 +57,10 @@ class window.Parser
 			
 	isFirstLevelNode: (node, graph) ->
 		### returns true if given node has no parents in given graph ###
-		if @topLevelNode != ''
-			for node in graph.nodes
-				if node and node.parents.length == 0
-					@topLevelNode = node.name
-					return true 
+		for nodeName of graph.nodes
+			if graph.nodes[nodeName].parents.length == 0
+				@topLevelNode = nodeName
+				return true
 		
 		return false
 
@@ -184,3 +188,8 @@ class window.Parser
 			direction = ""
 			
 		return {direction: direction, type:type, headLeft:headLeft, headRight:headRight}
+
+try  # use as global class if client
+	window.Parser = Parser
+catch error  # export if node.js
+	module.exports = Parser
