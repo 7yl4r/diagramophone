@@ -23,29 +23,29 @@ class Graph
     }
     ```
     ###
-    
+
     constructor: ->
         @node_count = 0
+        @root_node = {children:[]}  # imaginary node which links to any parentless nodes
         @nodes = {}
 
     add_node: (name, parents=[], children=[], others={}) ->
         ###
-        adds a node to the model. returns node if added or existing node if already exists.
+        adds a node to the model. returns node if added.
         :param others: an object with additional key-value pairs to be added to the node
         ###
+        throw Error('node name needed!') unless name
         try
             existing_node = @get_node(name)
-            return existing_node
+            throw Error('node already exists!')
         catch err
             if err.message.split(':')[0] == "node not found"
-                console.log('adding new node')
-                new_node = {
-                    "parents": parents,
-                    "children": children}
-                for attribute of others
-                    new_node.attribute = others.attribute
+                new_node = {"name":name, "parents": parents, "children": children}
+                if others
+                    new_node[attribute] = others[attribute] for attribute of others
                 @nodes[name] = new_node
                 @node_count += 1
+                @_parent_check(@nodes[name])
                 return @nodes[name]
 
     update_node: (name, parents, children) ->
@@ -61,10 +61,14 @@ class Graph
             node.children = children ? node.children
         else
             # add node
-            @add_node(name, parents ? [], children ? [])
+            node = @add_node(name, parents ? [], children ? [])
+
+        @_parent_check(node)
+        return node
 
     rename_node: (old_name, new_name) ->
         @nodes[new_name] = @get_node(old_name)
+        @nodes[new_name].name = new_name
         delete @nodes[old_name]
 
     add_edge: (from_node, to_node) ->
@@ -78,6 +82,11 @@ class Graph
                 fn.children.push(to_node)
             if from_node not in tn.parents
                 tn.parents.push(from_node)
+
+            if to_node in @root_node  # if orphan is gaining a parent
+                # unroot it
+                @root_node.children.splice(@root_node.children.indexOf(to_node), 1)
+
             return true
         else
             throw Error("cannot add edge, invalid nodes:" + from_node + "=" + fn + ", " + to_node + "=" + tn)
@@ -88,16 +97,25 @@ class Graph
         ###
         return @get_node(node_id).parents
 
-    get_node: (id) ->
+    get_node: (id, chill=false) ->
         ###
         _Returns:_ the node object.
+        _param chill:_ if true: returns undefined when not found, if false: freaks out and throws an error
         ###
         node = @nodes[id]
         if node
             return node
         else
-            console.log('cannot find node:', id)
-            throw Error("node not found")
+            if chill
+                return undefined
+            else
+                throw Error("node not found")
+
+    _parent_check: (node) ->
+        ### adds given node to root node if (s)he is a poor little orphan node ###
+        if node.parents.length == 0
+            @root_node.children.push(node.name)
+
 
 try  # use as global class if client
     window.Graph = Graph

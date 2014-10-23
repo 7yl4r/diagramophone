@@ -1,6 +1,6 @@
 module "utils",
 	setup: -> 
-		@monkey = new Graph()
+		@monkey = new Parser()
 
 test "yes message", ->
 	equal true, @monkey.hasMessage("a -> b : c")

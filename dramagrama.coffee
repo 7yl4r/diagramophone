@@ -21,12 +21,12 @@ class Controller
 		window.graph = blockGraph
 
 		@blocksThatIHaveDrawn = {}	# don't want to double draw blocks
-		@drawUnpositionedBlock(blockGraph.nodes[nodeId], blockGraph) for nodeId of blockGraph.nodes
+		@drawUnpositionedBlock(blockGraph.root_node, blockGraph)
 
 		@blocksThatIHaveDrawn = {}	# don't want to move around already drawn children shared by parents
-		@repositionBlock(blockGraph.nodes[nodeId], @drawer.startPoint, blockGraph) for nodeId of blockGraph.nodes
+		@repositionBlock(blockGraph.root_node, @drawer.startPoint, blockGraph)
 
-		@drawConnectors(blockGraph.nodes[nodeId], blockGraph) for nodeId of blockGraph.nodes
+		@drawConnectors(blockGraph.root_node, blockGraph)
 	
 	##############################
 	#	Things about drawing
@@ -39,8 +39,8 @@ class Controller
 		if block.name and @blocksThatIHaveDrawn[block.name]
 			return
 
-		#first draw yourself
-		drawnBlock = @drawer.drawUnpositionedBlock(block, graph) if block.parents
+		#first, if you're a node, draw yourself
+		drawnBlock = @drawer.drawUnpositionedBlock(block, graph) if block.name
 		@blocksThatIHaveDrawn[block.name] = drawnBlock
 
 		# recursively draw all your children

@@ -1,7 +1,6 @@
 class Parser
 	constructor: ->
-		@topLevelNode = ''
-		
+
 	parse: (text) ->
 		allTheLines = text.split("\n")
 		parsedBits = []
@@ -20,17 +19,20 @@ class Parser
 			bname = bit.second.name
 
 			console.log('a:',aname,'.','b:',bname,'.')
-			try
-				a = graph.add_node(aname, [], [], {colour: ""})
-				b = graph.add_node(bname, [], [], {colour: ""})
-			catch err
-				if err.message != 'node not found'
-					throw err
+
+			a = graph.get_node(aname, true)
+			b = graph.get_node(bname, true)
+
+			a = graph.add_node(aname, [], [], {colour: ""}) if !a and aname
+			b = graph.add_node(bname, [], [], {colour: ""}) if !b and bname
+
 
 			# don't panic about self loops
 			continue if aname == bname
 
 			if a and b
+				console.log('a=',a,'b=',b)
+				console.log('an=',aname,'bn=',bname)
 				if b.arrow
 					if b.arrow.direction == "left" or b.arrow.direct == undefined
 						graph.add_edge(bname, aname)
@@ -54,15 +56,6 @@ class Parser
 				b.arrow = bit.arrow if bit.arrow
 
 		return graph
-			
-	isFirstLevelNode: (node, graph) ->
-		### returns true if given node has no parents in given graph ###
-		for nodeName of graph.nodes
-			if graph.nodes[nodeName].parents.length == 0
-				@topLevelNode = nodeName
-				return true
-		
-		return false
 
 	parseLine: (text) ->
 		return unless text # hey there paranoia
@@ -148,7 +141,6 @@ class Parser
 					[first, arrow, second] = text.match(noArrow)[1..3]
 				catch e3
 					return null
-		
 		return {names:{first:first.trim(), second:second.trim()}, arrow:@extractArrow(arrow)}
 	
 	# TODO: this is still gross
