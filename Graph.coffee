@@ -26,7 +26,7 @@ class Graph
 
     constructor: ->
         @node_count = 0
-        @root_node = {children:[]}  # imaginary node which links to any parentless nodes
+        @root_node = {children:[]}  # imaginary common ancestor node, use to traverse all recursively
         @nodes = {}
 
     add_node: (name, parents=[], children=[], others={}) ->
@@ -85,7 +85,7 @@ class Graph
 
             if to_node in @root_node.children  # if orphan is gaining a parent
                 # unroot it
-                @root_node.children.splice(@root_node.children.indexOf(to_node), 1)
+                @_unroot(tn)
 
             return true
         else
@@ -115,6 +115,33 @@ class Graph
         ### adds given node to root node if (s)he is a poor little orphan node ###
         if node.parents.length == 0
             @root_node.children.push(node.name)
+
+    _has_root_link: (node, callChain=[]) ->
+        ### returns true if given node has ancestor that links to root, else returns false ###
+        if node.name in @root_node.children  # if root my daddy
+            return true
+        else if node.parents.length == 0  # if I am orphan
+            return false
+        else
+            if node.name in callChain  # if we've made a loop
+                return false
+            else
+                callChain.push(node.name)
+                for parentId in node.parents
+                    if @_has_root_link(@get_node(parentId), callChain)
+                        return true  # root is be my daddy's daddy's daddy's daddy's...
+                return false  # i can't link back to root
+
+    _unroot: (node) ->
+        ### removes node from root, but ensures that root remains an ancestor to the cluster ###
+        @root_node.children.splice(@root_node.children.indexOf(node.name), 1)
+        if !@_has_root_link(node)
+            # oops, put it back.
+            @root_node.children.push(node.name)
+            return false
+        else
+            return true
+
 
 
 try  # use as global class if client
