@@ -49,13 +49,16 @@ class Controller
 		return block
 			
 
-	repositionBlock: (block, point, graph) ->
+	repositionBlock: (block, point, graph, parentChain=[]) ->
 		###
 		moves the given block in the given graph to the given point
 		:returns: the width of the block's parent chain so far (for positioning)
 		###
 		return 0 unless block
-		console.log('r_block:', block)
+		if !block.name or block.parents.length == 0
+			parentChain = []
+		else
+			parentChain.push(block.name)
 
 		childY = point.y
 		childX = point.x
@@ -64,12 +67,11 @@ class Controller
 		totalChildLength = 0
 		# first draw all the children
 		for childId in block.children
-			continue if childId in @blocksThatIHaveDrawn  # stops inf loop for cycles
-			console.log('repos', childId, 'bc not in', @blocksThatIHaveDrawn)
+			continue if childId in parentChain  # stops inf loop for cycles
 			child = graph.get_node(childId)
 			nextChildStart = new Point childX, childY
 
-			childWidth = @repositionBlock(child, nextChildStart, graph)
+			childWidth = @repositionBlock(child, nextChildStart, graph, parentChain)
 			totalChildLength += childWidth + @drawer.childrenHorizontalPadding
 			childX = childX + childWidth + @drawer.childrenHorizontalPadding
 
@@ -89,16 +91,25 @@ class Controller
 			return block.width  
 		else return Math.max(block.width, totalChildLength)
 			
-	drawConnectors: (block, graph) ->
+	drawConnectors: (block, graph, parentChain=[]) ->
 		return unless block
+
+		if !block.name or block.parents.length == 0
+			parentChain = []
+		else
+			parentChain.push(block.name)
 
 		parentBlock = @blocksThatIHaveDrawn[block.name]
 		for childId in block.children
 			child = graph.get_node(childId)
 			if block.name
 				childBlock = @blocksThatIHaveDrawn[child.name]
-				@drawer.connectExistingBlocks(parentBlock, childBlock, "down", child.arrow )
-			@drawConnectors(child, graph)
+				if childId in parentChain
+					@drawer.connectExistingBlocks(parentBlock, childBlock, "up", child.arrow )
+					continue
+				else
+					@drawer.connectExistingBlocks(parentBlock, childBlock, "down", child.arrow )
+			@drawConnectors(child, graph, parentChain)
 
 	##############################
 	#	Things not about drawing
