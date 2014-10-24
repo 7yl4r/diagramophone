@@ -33,7 +33,7 @@ class Parser
 				console.log('a=',a,'b=',b)
 				console.log('an=',aname,'bn=',bname)
 				if b.arrow
-					if b.arrow.direction == "left" or b.arrow.direct == undefined
+					if b.arrow.direction == "left" or b.arrow.direction == undefined
 						graph.add_edge(bname, aname)
 					else if b.arrow.direction == "right"
 						graph.add_edge(aname, bname)
