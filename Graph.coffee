@@ -148,6 +148,10 @@ class Graph
         :returns: recycled node object
         ###
         nodeObj = @nodes[nodeId]
+        delete nodeObj.arrow
+        delete nodeObj.colour
+        delete nodeObj.drawn
+        delete nodeObj.top
         nodeObj.parents = []
         nodeObj.children = []
         return nodeObj
