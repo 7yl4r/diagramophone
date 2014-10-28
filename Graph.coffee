@@ -24,11 +24,12 @@ class Graph
     ```
     ###
 
-    constructor: ->
+    constructor: (recycling=false)->
         @node_count = 0
         @root_node = {children:[]}  # imaginary common ancestor node, use to traverse all recursively
         @nodes = {}
-        @trash_bin = {}  # removed nodes go here in case we want them back later
+        @recycle = recycling
+        @trash_bin = {}  # removed nodes go here in case we want them back later (if recycling is on)
 
     add_node: (name, parents=[], children=[], others={}) ->
         ###
@@ -123,9 +124,10 @@ class Graph
         ###
         clears all edges from nodes and recycles all nodes
         ###
-        # put all (de-edged) nodes in trash_bin
-        for nodeId of @nodes
-            @trash_bin[nodeId] = @_recycle_node(nodeId)
+        if @recycle
+            # put all (de-edged) nodes in trash_bin
+            for nodeId of @nodes
+                @trash_bin[nodeId] = @_recycle_node(nodeId)
             
         # remove all nodes from list
         @nodes = {}
