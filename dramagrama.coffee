@@ -1,6 +1,8 @@
 class Controller
-	makeItGo: (inputText, paper, hasSillyFont)->
+	constructor: () ->
 		@parser = new Parser
+		
+	makeItGo: (inputText, paper, hasSillyFont)->
 		@drawer = new Drawer(paper)
 		return unless inputText
 		

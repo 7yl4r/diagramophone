@@ -28,11 +28,13 @@ class Graph
         @node_count = 0
         @root_node = {children:[]}  # imaginary common ancestor node, use to traverse all recursively
         @nodes = {}
+        @trash_bin = {}  # removed nodes go here in case we want them back later
 
     add_node: (name, parents=[], children=[], others={}) ->
         ###
         adds a node to the model. returns node if added.
         :param others: an object with additional key-value pairs to be added to the node
+        :Returns: node object which has been added
         ###
         throw Error('node name needed!') unless name
         try
@@ -40,13 +42,19 @@ class Graph
             throw Error('node already exists!')
         catch err
             if err.message.split(':')[0] == "node not found"
-                new_node = {"name":name, "parents": parents, "children": children}
-                if others
-                    new_node[attribute] = others[attribute] for attribute of others
-                @nodes[name] = new_node
-                @node_count += 1
-                @_parent_check(@nodes[name])
-                return @nodes[name]
+                try 
+                    return @_unrecycle_node(name)
+                catch err
+                    if err.message == "node not in trash bin"
+                        new_node = {"name":name, "parents": parents, "children": children}
+                        if others
+                            new_node[attribute] = others[attribute] for attribute of others
+                        @nodes[name] = new_node
+                        @node_count += 1
+                        @_parent_check(@nodes[name])
+                        return @nodes[name]
+                    else
+                        throw err
 
     update_node: (name, parents, children) ->
         ###
@@ -110,6 +118,39 @@ class Graph
                 return undefined
             else
                 throw Error("node not found")
+                
+    clear: () -> 
+        ###
+        clears all edges from nodes and recycles all nodes
+        ###
+        # put all (de-edged) nodes in trash_bin
+        for nodeId of @nodes
+            @trash_bin[nodeId] = @_recycle_node(nodeId)
+            
+        # remove all nodes from list
+        @nodes = {}
+        @node_count = 0
+        @root_node.children = []
+        
+    _unrecycle_node: (nodeId) ->
+        node = @trash_bin[nodeId]
+        if node
+            @nodes[nodeId] = node
+            @node_count += 1
+            @_parent_check(node)
+            return node
+        else
+            throw Error("node not in trash bin")
+        
+    _recycle_node: (nodeId) ->
+        ###
+        prepares node for trash_bin by removing edges
+        :returns: recycled node object
+        ###
+        nodeObj = @nodes[nodeId]
+        nodeObj.parents = []
+        nodeObj.children = []
+        return nodeObj
 
     _parent_check: (node) ->
         ### adds given node to root node if (s)he is a poor little orphan node ###

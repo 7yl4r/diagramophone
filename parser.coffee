@@ -1,5 +1,6 @@
 class Parser
-	constructor: ->
+	constructor: () ->
+		@graph = new Graph
 
 	parse: (text) ->
 		allTheLines = text.split("\n")
@@ -10,8 +11,8 @@ class Parser
 		return @parseTree parsedBits
 
 	parseTree: (parsedBits) ->
-		### converts parsed bits into a Graph object ###
-		graph = new Graph
+		### converts parsed bits into a Graph object ###		
+		@graph.clear()
 		
 		for bit in parsedBits
 			continue unless bit
@@ -20,11 +21,11 @@ class Parser
 
 			console.log('a:',aname,'.','b:',bname,'.')
 
-			a = graph.get_node(aname, true)
-			b = graph.get_node(bname, true)
+			a = @graph.get_node(aname, true)
+			b = @graph.get_node(bname, true)
 
-			a = graph.add_node(aname, [], [], {colour: ""}) if !a and aname
-			b = graph.add_node(bname, [], [], {colour: ""}) if !b and bname
+			a = @graph.add_node(aname, [], [], {colour: ""}) if !a and aname
+			b = @graph.add_node(bname, [], [], {colour: ""}) if !b and bname
 
 			# don't panic about self loops
 			continue if aname == bname
@@ -34,16 +35,16 @@ class Parser
 				console.log('an=',aname,'bn=',bname)
 				if b.arrow
 					if b.arrow.direction == "left" or b.arrow.direction == undefined
-						graph.add_edge(bname, aname)
+						@graph.add_edge(bname, aname)
 					else if b.arrow.direction == "right"
-						graph.add_edge(aname, bname)
+						@graph.add_edge(aname, bname)
 					else if b.arrow.direction == "both"
-						graph.add_edge(aname, bname)
-						graph.add_edge(bname, aname)
+						@graph.add_edge(aname, bname)
+						@graph.add_edge(bname, aname)
 					else
 						throw Error("unknown edge type:"+b.arrow.direction)
 				else
-						graph.add_edge(aname, bname)
+						@graph.add_edge(aname, bname)
 
 
 
@@ -54,7 +55,7 @@ class Parser
 				b.colour = bit.second.colour if bit.second.colour
 				b.arrow = bit.arrow if bit.arrow
 
-		return graph
+		return @graph
 
 	parseLine: (text) ->
 		return unless text # hey there paranoia
