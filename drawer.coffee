@@ -96,7 +96,7 @@ class Drawer
 			})
 		t.attr("text", content)
 		t[0].setAttribute("class", 'diagramophone-node-text')
-		t[0].setAttribute("onclick", "Drawer.click_node('" + content + "')")
+		t[0].setAttribute("onclick", "window.controller.drawer.click_node('" + content + "')")
 
 		textWidth = Math.max(t.getBBox().width, @rectangleWidth)
 		textHeight = Math.max(t.getBBox().height, @rectangleHeight)
@@ -164,7 +164,7 @@ class Drawer
 
 	click_node: (node_id) ->
 		# this is pretty awkward, but let's put the onclick for nodes here
-		console.log(node_id + ' clicked. Overload window.Drawer.click_node to use.')
+		console.log(node_id + ' clicked. Overload window.controller.drawer.click_node to use.')
 
 try  # use as global class if client
 	window.Drawer = Drawer
