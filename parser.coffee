@@ -19,8 +19,6 @@ class Parser
 			aname = bit.first.name
 			bname = bit.second.name
 
-			console.log('a:',aname,'.','b:',bname,'.')
-
 			a = @graph.get_node(aname, true)
 			b = @graph.get_node(bname, true)
 
@@ -31,8 +29,6 @@ class Parser
 			continue if aname == bname
 
 			if a and b
-				console.log('a=',a,'b=',b)
-				console.log('an=',aname,'bn=',bname)
 				if b.arrow
 					if b.arrow.direction == "left" or b.arrow.direction == undefined
 						@graph.add_edge(bname, aname)

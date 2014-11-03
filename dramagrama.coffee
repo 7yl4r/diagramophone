@@ -19,7 +19,7 @@ class Controller
 		2. now that you have the heights of all the of the blocks, you can position them around
 		3. now that you've positioned them around, you can draw the arrows that connect them
 		###
-		console.log('graph', blockGraph)
+		#console.log('graph', blockGraph)
 		window.graph = blockGraph
 
 		@blocksThatIHaveDrawn = {}	# don't want to double draw blocks
