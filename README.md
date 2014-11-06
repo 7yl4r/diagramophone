@@ -60,7 +60,7 @@ b <>-d
 #### Attaching Events to the blocks
 Events can be attached to blocks to make your diagrams more interactive. This is easily accomplished using jquery to get all elements in the "diagramophone-node-text" class:
 ```javascript
-$(".diagramophone-node-text").on("click", function(evt){alert('node clicked: '+evt.target.innerHTML);});
+$("#yourDiagramCanvas").on("click", ".diagramophone-node-text", function(evt){alert('node clicked: '+evt.target.innerHTML);});
 ```
 
 ## Things that don't work
