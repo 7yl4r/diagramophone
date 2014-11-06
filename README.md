@@ -57,6 +57,12 @@ a -> c
 b <>-d
 ```
 
+#### Attaching Events to the blocks
+Events can be attached to blocks to make your diagrams more interactive. This is easily accomplished using jquery to get all elements in the "diagramophone-node-text" class:
+```javascript
+$(".diagramophone-node-text").on("click", function(evt){alert('node clicked: '+evt.target.innerHTML);});
+```
+
 ## Things that don't work
 (and that we call "open issues", are pretty annoying, and I'm working on fixing:)
 * exporting the svg to a png loses the arrow heads and the dotted lines. yay :(
