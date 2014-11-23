@@ -1,3 +1,13 @@
+class Node
+    constructor: (name, parents=[], children=[]) ->
+        @name = name
+        @parents = parents
+        @children = children
+
+    equals: (vertex) ->
+        # equality check based on vertex name
+        return (vertex.name && @name==vertex.name)
+
 class Graph
     ###
     A data class representing a directed graph.
@@ -47,7 +57,7 @@ class Graph
                     return @_unrecycle_node(name)
                 catch err
                     if err.message == "node not in trash bin"
-                        new_node = {"name":name, "parents": parents, "children": children}
+                        new_node = new Node(name, parents, children)
                         if others
                             new_node[attribute] = others[attribute] for attribute of others
                         @nodes[name] = new_node
