@@ -8,6 +8,13 @@ class Node
         # equality check based on vertex name
         return (vertex.name && @name==vertex.name)
 
+    getPackedNode: (attr)->
+        # returns a packed version of the node containing only attributes specified in the 'attr' list
+        packedNode = {}
+        for key in attr
+            packedNode[key] = @[key]
+        return packedNode
+
 class Graph
     ###
     A data class representing a directed graph.
